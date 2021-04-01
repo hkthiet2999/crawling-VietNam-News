@@ -34,15 +34,14 @@ def get_page_urls_vnexpress(base_url, quantity):
     return url_list
 
 ```
- Mỗi trang báo đều có một cấu trúc url riêng, tương tự trang tin vietnamnet.vn sẽ là `https://vietnamnet.vn/vn/thoi-su/trang2/ và trang tin thanhnien.vn` sẽ là `https://thanhnien.vn/thoi-su/trang-2.html`. Do đó để có thể crawl được nhiều trang báo, bạn sẽ phải xác định được làm sao để gửi một request đến trang kế của trang bạn đang crawl dữ liệu và tiếp tục crawl dữ liệu trên trang kế đó.
 
- Bước tiếp theo, mình truy cập đến trang bạn cần crawl dữ liệu, sau đó bôi đen một bảng tin và inspect để xem cấu trúc html của nó. Dưới đây là cấu trúc html của một bảng tin trong trang vnexpress:
+Mỗi trang báo đều có một cấu trúc url riêng, tương tự trang tin vietnamnet.vn sẽ là `https://vietnamnet.vn/vn/thoi-su/trang2/ và trang tin thanhnien.vn` sẽ là `https://thanhnien.vn/thoi-su/trang-2.html`. Do đó để có thể crawl được nhiều trang báo, bạn sẽ phải xác định được làm sao để gửi một request đến trang kế của trang bạn đang crawl dữ liệu và tiếp tục crawl dữ liệu trên trang kế đó.
+
+Bước tiếp theo, mình truy cập đến trang bạn cần crawl dữ liệu, sau đó bôi đen một bảng tin và inspect để xem cấu trúc html của nó. Dưới đây là cấu trúc html của một bảng tin trong trang vnexpress:
 
 ![](img/inspect_vnexpress.png)
- 
- 
- 
- Dựa vào đó, bạn sẽ phân tích lần lượt như sau: Thẻ mình cần lấy thông tin (url và title) là thẻ <a>, mỗi thẻ <a> đó sẽ có thẻ <h3> chứa nó và thẻ <section> chứa tất cả các thẻ <h3> trên. Dựa vào phân tích này, ta sẽ lần lượt down html của cả trang, sau đó chỉ chọn các thẻ <section> chứa các thẻ <h3> như trên dựa vào class của nó, tiếp theo là lấy tất cả các thẻ <h3> bên trong thẻ <section> và cuối cùng là tất cả các thẻ <a> mà ta cần tìm. Từ các thẻ <a> này ta sẽ lấy được link cũng như title của từng bài báo có trong trang báo mà ta đang crawl. Đoạn code mình thực hiện việc lấy link và title của trang vnexpress như sau:
+  
+Dựa vào đó, bạn sẽ phân tích lần lượt như sau: Thẻ mình cần lấy thông tin (url và title) là thẻ `<a>`, mỗi thẻ `<a>` đó sẽ có thẻ `<h3>` chứa nó và thẻ `<section>` chứa tất cả các thẻ `<h3>` trên. Dựa vào phân tích này, ta sẽ lần lượt down html của cả trang, sau đó chỉ chọn các thẻ `<section>` chứa các thẻ `<h3>` như trên dựa vào class của nó, tiếp theo là lấy tất cả các thẻ `<h3>` bên trong thẻ `<section>` và cuối cùng là tất cả các thẻ `<a>` mà ta cần tìm. Từ các thẻ <a> này ta sẽ lấy được link cũng như title của từng bài báo có trong trang báo mà ta đang crawl. Đoạn code mình thực hiện việc lấy link và title của trang vnexpress như sau:
 
 ```jsx
 # VNEXPRESS
@@ -97,10 +96,11 @@ def get_links_in_page_vietnamnet(url):
         results.append([title,link])
     return results
 ```
- Một ví dụ đối với trang vietnamnet.vn, thẻ <a> của họ có attribute href thiếu mất domain, bạn phải cộng thể chuỗi 'https://vietnamnet.vn/vn/thoi-su' vào đường link trong href mới có được url hoàn chỉnh.
+ Một ví dụ đối với trang vietnamnet.vn, thẻ `<a>` của họ có attribute href thiếu mất domain, bạn phải cộng thể chuỗi `https://vietnamnet.vn/vn/thoi-su` vào đường link trong href mới có được url hoàn chỉnh.
 
 
  Sau khi có được các link và title, giờ chỉ việc lần lượt crawl từng trang html về, sau đó tiến hành ghi ra file kết quả là xong. Mọi công việc crawl này bạn có thể sử dụng thư viện Acticle của newspaper:
+
 ```jsx
 def crawl_by_url(url, title):
     article = Article(url, language='vi')
